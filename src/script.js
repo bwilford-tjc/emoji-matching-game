@@ -1,6 +1,5 @@
 const gray = "rgb(228, 230, 235)";
 const green = "rgb(73, 251, 53)";
-const black = "rgb(40, 40, 40)";
 var board = [];
 var pickSet = [];
 var pickSetCounter = 0;
@@ -11,6 +10,7 @@ var currentStreakNum = 0;
 const longestStreak = document.getElementById("longestStreak");
 var longestStreakNum = 0;
 var level = 1;
+var matchesThisLevel = 0;
 
 var emojis = [];
 
@@ -56,7 +56,7 @@ const emojisFaces = [
   "😒",
   "🙄",
   "😬",
-  "😮‍",
+  "😮‍💨",
   "🤥",
   "😌",
   "😔",
@@ -70,7 +70,7 @@ const emojisFaces = [
   "🤧",
   "🥴",
   "😵",
-  "😵‍",
+  "😵‍💫",
   "🤯",
   "🤠",
   "🥳",
@@ -228,7 +228,7 @@ const emojisAnimalBodies = [
   "🦍",
   "🐕",
   "🦮",
-  "🐕‍",
+  "🐕‍🦺",
   "🐩",
   "🐈",
   "🐅",
@@ -417,7 +417,7 @@ const emojisPeopleFantasy = [
   "🧙‍♂️",
   "🧙‍♀️",
   "🧚‍♂️",
-  "🧛‍",
+  "🧛‍♂️",
   "🧜‍♂️",
   "🧜‍♀️",
   "🧝‍♂️",
@@ -425,8 +425,8 @@ const emojisPeopleFantasy = [
   "🧞‍♂️",
   "🧞‍♀️",
   "🧟‍♂️",
-  "💆‍",
-  "💇‍"
+  "💆‍♂️",
+  "💇‍♂️"
 ];
 
 // 14
@@ -751,7 +751,7 @@ function initializeBoard() {
     y.innerHTML = "";
     y.style.backgroundColor = gray;
     y.style.borderColor = gray;
-    y.classList.toggle("fade");
+    y.classList.remove("fade");
   }
 }
 
@@ -776,6 +776,7 @@ function initializeBoardFirst() {
 }
 
 function getRandEmoji() {
+  let rand;
   do {
     rand = Math.floor(Math.random() * (emojis.length + 1));
   } while (emojis[rand] === undefined);
@@ -889,7 +890,7 @@ function shuffleBoard(array) {
 function play(tile) {
   let x = "tile" + tile;
   let selectedTile = document.getElementById(x);
-  if (selectedTile.innerHTML === "") {
+  if (selectedTile.innerHTML === "" || selectedTile.classList.contains("fade")) {
     return;
   }
   if (tile === currentTile) {
@@ -905,11 +906,14 @@ function play(tile) {
   let tileToCheck = document.getElementById(y);
   if (selectedTile.innerHTML === tileToCheck.innerHTML) {
     selectedTile.style.borderColor = green;
-    selectedTile.classList.toggle("fade");
-    // selectedTile.innerHTML = "";
-    tileToCheck.classList.toggle("fade");
+    selectedTile.classList.add("fade");
+    tileToCheck.classList.add("fade");
     currentStreakNum++;
+    matchesThisLevel++;
     updateScoreboard();
+    if (matchesThisLevel === 21) {
+      advanceLevel();
+    }
     isOneTileSelected = false;
     currentTile = 0;
     return;
@@ -931,24 +935,18 @@ function updateScoreboard() {
   }
 }
 
-function testLevelComplete() {
-  for (let i = 1; i <= 42; i++) {
-    let x = "tile" + i;
-    let y = document.getElementById(x);
-    let z = window.getComputedStyle(y).getPropertyValue("opacity");
-    if (z !== "0") {
-      return;
-    }
-  }
+function advanceLevel() {
   level++;
+  matchesThisLevel = 0;
   if (pickSetCounter === 23) pickSetCounter = 0;
   else pickSetCounter++;
   let newLevel = document.getElementById("level");
   newLevel.innerHTML = "Level: " + level;
   isOneTileSelected = false;
-  initializeBoard();
-  setBoard();
-  return;
+  setTimeout(function () {
+    initializeBoard();
+    setBoard();
+  }, 500);
 }
 
 for (let i = 1; i <= 42; i++) {
@@ -959,4 +957,3 @@ for (let i = 1; i <= 42; i++) {
 
 initializeBoardFirst();
 setBoard();
-setInterval(testLevelComplete, 100);
