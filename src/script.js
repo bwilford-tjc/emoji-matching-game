@@ -951,6 +951,12 @@ function testLevelComplete() {
   return;
 }
 
+for (let i = 1; i <= 42; i++) {
+  document.getElementById("tile" + i).addEventListener("click", function () {
+    play(i);
+  });
+}
+
 initializeBoardFirst();
 setBoard();
 setInterval(testLevelComplete, 100);
